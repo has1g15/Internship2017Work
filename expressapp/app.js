@@ -1,19 +1,32 @@
 //setting up everything
 var config = {
 	region: "us-east-2",
-	accessKeyId: "AKIAI55LGXUPXY5J2IXQ",
-	secretAccessKey: "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"
+	accessKeyId: "AKIAJG76MENGEH6BXKTQ",
+	secretAccessKey: "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"
 };
 var AWS = require("aws-sdk");
-AWS.config.update({
-    region: "us-east-2",
-    endpoint: "dynamodb.us-east-2.amazonaws.com"
+	AWS.config.update({
+	region: "us-east-2",
+	endpoint: "dynamodb.us-east-2.amazonaws.com"
 });
+var globals = {
+	clientID: "5q5hugosg9t383rpi5mcfn0j74",
+	exec: require('child_process').exec,
+	child: "",
+	stuff: "",
+	uname: "",
+	pass: "",
+	prepass: ""
+}
+	
 var ddb = new AWS.DynamoDB();
 var express = require('express');
 var app = express();
 app.locals.points = "8,713";
-
+app.locals.exec = require('child_process').exec;
+app.locals.child;
+app.locals.stuff;
+//app.locals.clientID = "5q5hugosg9t383rpi5mcfn0j74";
 var router = express.Router();
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -22,13 +35,11 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var sys = require('util')
-var exec = require('child_process').exec;
-var child;
-var stuff;
+
 
 //This is the code we used to perform the operations at the command line interface
 //We kept it in case we need any of the code
-/*const readline = require('readline');
+const readline = require('readline');
 const rl = readline.createInterface({
 	input: process.stdin,
     output: process.stdout
@@ -40,8 +51,8 @@ var email;
 var prepass;
 var valcode;
 var action;
-rl.question('Select Operation: \n 1 - Create User \n 2 - Change User Password \n 3 - Forgotten User Password \n', (answer1) => {
-	response = answer1;
+
+	/*response = answer1;
 	if (response == 1)
 	{
 		
