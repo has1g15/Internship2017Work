@@ -70,21 +70,5 @@ rl.question('Run config: \n 1 - Development \n 2 - Production \n', (answer1) => 
 });
 //scanning the users in our DynamoDB and adding ones to Cognito if they aren't already there
 
-
-
-
-/*child = exec("aws dynamodb get-item --table-name UserDetails --key UserID={N=1} --attributes-to-get Username", function (error, stdout, stderr) {
-  stuff1 = stdout;
-  if (error !== null) {
-    console.log('exec error: ' + error);
-  }
-});
-child = exec("aws dynamodb get-item --table-name UserDetails --key UserID={N=2} --attributes-to-get Username", function (error, stdout, stderr) {
-  stuff2= stdout;
-  if (error !== null) {
-    console.log('exec error: ' + error);
-  }
-});*/
-
 module.exports = router;
 
