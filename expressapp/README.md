@@ -17,16 +17,18 @@ Initially users can be added via a rest client by providing an API gateway URL, 
   }
 }
 
-This will add the user to a DynamoDB table, UserDetailsDev on Amazon Web Services 
+This will add the user to a DynamoDB table "UserDetailsDev" on Amazon Web Services 
 
-The application is designed to add users who exist in the DynamoDB table but aren't in the Cognito user pool to the pool enabling them to have a password 
+The application is designed to add users to the Cognito user pool if they exist in the DynamoDB table but aren't yet in the user pool, enabling them to have a password 
 
-2. Changing users password 
+2. Changing a user's password 
 
-On the change password page of the express server, you can simulate a user's change of password, a random user will be chosen and there password changed by the application executing the change-password Cognito command 
+On the change password page of the express server, you can simulate a user's change of password - a random user will be chosen and their password changed by the application which executes the change-password Cognito command.
 
 For future development, the application could have a front end in which the user enters their choice of new password as well as their previous password. 
 
-3. Resetting users password 
+3. Resetting a user's password 
 
-This action is carried out in a similar way to changing password, by selecting the 'forgot password' page, the application will email an arbitrary user an authentication code, after this the user can enter the AWS command: aws cognito-idp confirm-forgot-password --client-id <client ID from user pool> --confirmation-code <6-digit confirmation code in e-mail>  --password <new_password> --username <username>
+This action is carried out in a similar way to changing password, the application randomly changes a user's password.
+
+For future development, the application would have a front end in which a user could input their username and the application would execute the forgot-password Cognito command. The user would receive an email with an authentication code to put into the front end and then reset their password from there.
