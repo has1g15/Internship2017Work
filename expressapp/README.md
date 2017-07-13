@@ -17,9 +17,9 @@ Initially users can be added via a rest client by providing an API gateway URL, 
   }
 }
 
-This will add the user to a DynamoDB table, UserDetailsDev on Amazon Web Services 
+This will add the user to a DynamoDB table "UserDetailsDev" on Amazon Web Services 
 
-The application is designed to add users who exist in the DynamoDB table but aren't in the Cognito user pool to the pool enabling them to have a password 
+The application is designed to add users to the Cognito user pool if they exist in the DynamoDB table but aren't yet in the user pool, enabling them to have a password 
 
 2. Changing a user's password 
 
