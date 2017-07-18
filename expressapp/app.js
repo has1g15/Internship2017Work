@@ -17,8 +17,6 @@ var child;
 
 var usernames = [];
 var count = 0;
-
-rand = Math.round(random(0, count -1));
 			
 function random (low, high) {
     return Math.random() * (high - low) + low;
@@ -83,6 +81,7 @@ app.get("/createusers", function(req, res) {
 });
 
 app.get("/forgotpassword", function(req, res) {
+	res.json({message: "Forgot Password"});
 	child = exec("aws dynamodb scan --table-name UserDetailsDev", function (error, stdout, stderr) {
 	console.log("Scanning table");
 		
@@ -97,6 +96,15 @@ app.get("/forgotpassword", function(req, res) {
 				console.log(usernames[count]);
 					 count++;
 			}
+			
+			if (error !== null) {
+				console.log('exec error: ' + error);
+			}
+			
+			rand = Math.round(random(0, count -1));
+			console.log("Index of random user: " + rand);
+			console.log("Simulating " + usernames[rand] + " forgetting password");
+			
 //child=exec("aws cognito-idp forgot-password --client-id 5q5hugosg9t383rpi5mcfn0j74 --username " + usernames[rand], function (error, stdout, stderr){ 
 			//When incorportating front end features, this would be the command used, there would be facility for the user to enter the confirmation code they have received via email
 			/*child=exec("aws cognito-idp confirm-forgot-password --client-id 5q5hugosg9t383rpi5mcfn0j74 --confirmation-code " + valcode + " --password " + pass + " --username " + uname, function (error, stdout, stderr){
@@ -125,6 +133,52 @@ app.get("/forgotpassword", function(req, res) {
 			});
 		});
 	});	
+
+app.get("/changepassword", function(req, res) {	
+res.json({message: "Change Password"});
+child = exec("aws dynamodb scan --table-name UserDetailsDev", function (error, stdout, stderr) {
+	console.log("Scanning table");
+		
+			if(error !== null) {
+				console.log("Error in change password" + stderr);
+			}
+			stuff = stdout;
+			parts = stuff.split('\"');
+			
+			for (var i = 21; i < parts.length; i+=24)
+			{
+				usernames[count] = parts[i];
+				console.log(usernames[count]);
+					 count++;
+			}
+			
+			if (error !== null) {
+				console.log('exec error: ' + error);
+			}
+			
+			rand = Math.round(random(0, count -1));
+			console.log("Index of random user: " + rand);
+			console.log("Simulating " + usernames[rand] + " changing password");
+		
+			child=exec("aws cognito-idp admin-initiate-auth --user-pool-id us-east-2_M8LZIsbAN --client-id 5q5hugosg9t383rpi5mcfn0j74 --auth-flow ADMIN_NO_SRP_AUTH --auth-parameters USERNAME=" + usernames[rand] + ",PASSWORD=Password1", function (error, stdout, stderr){
+				if (error !== null) {
+					console.log("Error: " + stderr);
+				}
+				
+				var token = stdout.split('\"');
+				child=exec("aws cognito-idp change-password --previous-password Password1 --proposed-password Password1 --access-token " + token[19], function (error, stdout, stderr){
+					if (error == null) {
+						console.log('Password Successfully Changed!');
+						action = "Password changed";
+					} else {
+						console.log("Error: " + stderr);
+					}
+				});		
+			});
+
+		});
+});
+
 var jwtOptions = {}
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
 jwtOptions.secretOrKey = 'secretKey';
