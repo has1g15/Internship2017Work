@@ -32,3 +32,7 @@ For future development, the application could have a front end in which the user
 This action is carried out in a similar way to changing password, the application randomly changes a user's password.
 
 For future development, the application would have a front end in which a user could input their username and the application would execute the forgot-password Cognito command. The user would receive an email with an authentication code to put into the front end and then reset their password from there.
+
+4. Authentication via a token
+
+At the moment, if you go onto a rest client (we are using Postman), go to the URL https://localhost:3000/login and type in the header a valid username and password then Send a GET request, you will receive your access token. If you then go to the URL https://localhost:3000/test and type in "Authorisation" for the key in the header, then "JWT " followed by the access token, you will receive a message that says "Success". You will not receive this message if an invalid access token is used.
