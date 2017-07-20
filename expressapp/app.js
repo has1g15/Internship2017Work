@@ -24,12 +24,14 @@ function random (low, high) {
 
 var users = [
   {
-    username: 'has1g15',
+	id: 1,
+    name: 'has1g15',
     password: 'Password1'
   },
   {
-    name: 'test',
-    password: 'test'
+	id: 2,
+    name: 'trs1g15',
+    password: 'Password2'
   }
 ];
 
@@ -38,6 +40,117 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use(bodyParser.json())
+
+var jwtOptions = {}
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
+jwtOptions.secretOrKey = 'secretKey';
+
+var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
+  console.log('payload received', jwt_payload);
+  //iterate round dynamoDB users to check existing user 
+  var user = users[_.findIndex(users, {id: jwt_payload.id})];
+  if (user) {
+    next(null, user);
+  } else {
+    next(null, false);
+  }
+});
+
+passport.use(strategy);
+
+app.use(passport.initialize());
+
+app.get("/", function(req, res) {
+  res.json({message: "Login Page"});
+});
+
+app.post("/login", function(req, res) {
+  if(req.body.name && req.body.password){
+    var name = req.body.name;
+    var password = req.body.password;
+  }
+  // usually this would be a database call:
+  var user = users[_.findIndex(users, {name: name})];
+  if( ! user ){
+    res.status(401).json({message:"Unable to find user"});
+  }
+
+  if(user.password === req.body.password) {
+    var payload = {id: user.id};
+    var token = jwt.sign(payload, jwtOptions.secretOrKey);
+    res.json({message: "Password accepted", token: token});
+  } else {
+    res.status(401).json({message:"Passwords do not match"});
+  }
+});
+
+app.get("/test", passport.authenticate('jwt', { session: false }), function(req, res){
+  res.json({message: "Successful"});
+});
+
+function getToken() {
+  var loginUrl = "http://localhost:3000/login"
+  var xhr = new XMLHttpRequest();
+  var userElement = document.getElementById('username');
+  var passwordElement = document.getElementById('password');
+  var tokenElement = document.getElementById('token');
+  var user = userElement.value;
+  var password = passwordElement.value;
+
+  xhr.open('POST', loginUrl, true);
+  xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+  xhr.addEventListener('load', function() {
+    var responseObject = JSON.parse(this.response);
+    console.log(responseObject);
+    if (responseObject.token) {
+      tokenElement.innerHTML = responseObject.token;
+    } else {
+      tokenElement.innerHTML = "No token received";
+    }
+  });
+
+  var sendObject = JSON.stringify({name: user, password: password});
+
+  console.log('going to send', sendObject);
+
+  xhr.send(sendObject);
+}
+
+function getSecret() {
+
+  var url = "http://localhost:3000/secret"
+  var xhr = new XMLHttpRequest();
+  var tokenElement = document.getElementById('token');
+  var resultElement = document.getElementById('result');
+  xhr.open('GET', url, true);
+  xhr.setRequestHeader("Authorization", "JWT " + tokenElement.innerHTML);
+  xhr.addEventListener('load', function() {
+    var responseObject = JSON.parse(this.response);
+    console.log(responseObject);
+    resultElement.innerHTML = this.responseText;
+  });
+
+  xhr.send(null);
+}
+
+var request = require("request");
+
+var options = { method: 'POST',
+  url: 'https://localhost:3000/test',
+  headers: { 'content-type': 'application/json' },
+  body: 
+   { grant_type: 'authorization_code',
+     client_id: 'b5e12a8a-d1cf-4885-93c7-1e6df4f87962',
+     client_secret: 'T2vzr4pzpdYbUfnCuJhCwOY',
+     code: 'YOUR_AUTHORIZATION_CODE',
+     redirect_uri: 'https://localhost:3000/login/callback' },
+  json: true };
+
+  console.log(options.body);
+request(options, function (error, response, body) {
+  //if (error) throw new Error(error);
+  console.log(body);
+});
 
 app.get("/createusers", function(req, res) {
   res.json({message: "Add users via Postman or similar REST client, they will then be allocated a password"});
@@ -178,55 +291,6 @@ child = exec("aws dynamodb scan --table-name UserDetailsDev", function (error, s
 
 		});
 });
-
-var jwtOptions = {}
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
-jwtOptions.secretOrKey = 'secretKey';
-
-var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
-  console.log('payload received', jwt_payload);
-  //iterate round dynamoDB users to check existing user 
-  var user = users[_.findIndex(users, {username: jwt_payload.username})];
-  if (user) {
-    next(null, user);
-  } else {
-    next(null, false);
-  }
-});
-
-passport.use(strategy);
-
-app.use(passport.initialize());
-
-app.get("/", function(req, res) {
-  res.json({message: "Login Page"});
-});
-
-app.post("/login", function(req, res) {
-  if(req.body.name && req.body.password){
-    var name = req.body.name;
-    var password = req.body.password;
-  }
-  // usually this would be a database call:
-  var user = users[_.findIndex(users, {name: name})];
-  if( ! user ){
-    res.status(401).json({message:"Unable to find user"});
-  }
-
-  if(user.password === req.body.password) {
-    var payload = {username: user.username};
-    var token = jwt.sign(payload, jwtOptions.secretOrKey);
-    res.json({message: "Password accepted", token: token});
-  } else {
-    res.status(401).json({message:"Passwords do not match"});
-  }
-});
-
-app.get("/test", passport.authenticate('jwt', { session: false }), function(req, res){
-  res.json({message: "Yay"});
-});
-
-app
 
 app.listen(3000, function() {
   console.log("Listening on port 3000");
