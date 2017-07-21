@@ -3,12 +3,79 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var jwt = require('jsonwebtoken');
+var router = express.Router();
 
 var passport = require("passport");
-var passportJWT = require("passport-jwt");
+//var passportJWT = require("passport-jwt");
+var Auth0Strategy = require('passport-auth0');
 
-var ExtractJwt = passportJWT.ExtractJwt;
-var JwtStrategy = passportJWT.Strategy;
+//var ExtractJwt = passportJWT.ExtractJwt;
+//var JwtStrategy = passportJWT.Strategy;
+
+var strategy = new Auth0Strategy(
+  {
+    domain: 'timhannah.eu.auth0.com',
+    clientID: 'kbbO4O2GK9MVgRfVY7Usz_5yKZUBj5Hf',
+    clientSecret: 'YOUR_CLIENT_SECRET',
+    callbackURL: 'http://localhost:3000/callback'
+  },
+  (accessToken, refreshToken, extraParams, profile, done) => {
+    return done(null, profile);
+  }
+);
+
+passport.use(strategy);
+
+var env = {
+  AUTH0_CLIENT_ID: 'kbbO4O2GK9MVgRfVY7Usz_5yKZUBj5Hf',
+  AUTH0_DOMAIN: 'timhannah.eu.auth0.com',
+  AUTH0_CALLBACK_URL: 'http://localhost:3000/callback'
+};
+
+// Perform the login
+router.get(
+  '/login',
+  passport.authenticate('auth0', {
+    clientID: env.AUTH0_CLIENT_ID,
+    domain: env.AUTH0_DOMAIN,
+    redirectUri: env.AUTH0_CALLBACK_URL,
+    audience: 'https://' + env.AUTH0_DOMAIN + '/userinfo',
+    responseType: 'code',
+    scope: 'openid'
+  }),
+  function(req, res) {
+    res.redirect('/');
+  }
+);
+
+// Perform session logout and redirect to homepage
+router.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
+
+// Perform the final stage of authentication and redirect to '/user'
+router.get(
+  '/callback',
+  passport.authenticate('auth0', {
+    failureRedirect: '/'
+  }),
+  function(req, res) {
+    res.redirect(req.session.returnTo || '/user');
+  }
+);
+
+// This can be used to keep a smaller payload
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+  done(null, user);
+});
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 var stuff;
 var parts;
@@ -41,12 +108,16 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json())
 
-var jwtOptions = {}
+/*var jwtOptions = {}
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
-jwtOptions.secretOrKey = 'secretKey';
+jwtOptions.secretOrKey = 'secretKey';*/
 
-var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
-  console.log('payload received', jwt_payload);
+/*var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
+	domain: 'timhannah.eu.auth0.com',
+	clientID: '9Kwf4wkYp4Rjmw0rROVatC7lcD952OCj',
+	clientSecret: 'pnMBr1YpHCXCyk_7QXfzcDPw6KlF1i_-XoPnnWAMIhV6_LjNwjZcSrcsMI4OXwmC'.
+	callbackURL: '/callback'
+	/*console.log('payload received', jwt_payload);
   //iterate round dynamoDB users to check existing user 
   var user = users[_.findIndex(users, {id: jwt_payload.id})];
   if (user) {
@@ -54,7 +125,7 @@ var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
   } else {
     next(null, false);
   }
-});
+});*/
 
 passport.use(strategy);
 
@@ -135,7 +206,7 @@ function getSecret() {
 
 var request = require("request");
 
-var options = { method: 'POST',
+/*var options = { method: 'POST',
   url: 'https://localhost:3000/test',
   headers: { 'content-type': 'application/json' },
   body: 
@@ -150,7 +221,7 @@ var options = { method: 'POST',
 request(options, function (error, response, body) {
   //if (error) throw new Error(error);
   console.log(body);
-});
+});*/
 
 app.get("/createusers", function(req, res) {
   res.json({message: "Add users via Postman or similar REST client, they will then be allocated a password"});
