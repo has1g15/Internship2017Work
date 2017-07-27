@@ -106,11 +106,7 @@ var users = [
   }
 ];
 
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
 
-app.use(bodyParser.json())
 
 var jwtOptions = {}
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
@@ -142,18 +138,24 @@ passport.use(strategy);
 
 app.use(passport.initialize());
 
-app.get("/", function(req, res) {
-  res.json("Main Page");
-});
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+
+app.use(bodyParser.json());
+
+var refreshToken;
+
+var user;
 
 app.post("/login", function(req, res) {
 	//res.json("Login");
   if(req.body.name && req.body.password){
     var name = req.body.name;
+	user = users[_.findIndex(users, {name: name})];
     var password = req.body.password;
   }
   // usually this would be a database call:
-  var user = users[_.findIndex(users, {name: name})];
   if( ! user ){
     res.status(401).json({message:"Unable to find user"});
   }
@@ -161,7 +163,7 @@ app.post("/login", function(req, res) {
   if(user.password === req.body.password) {
     var payload = {id: user.id, exp:(Date.now() / 1000) + 60};
     var token = jwt.sign(payload, jwtOptions.secretOrKey);
-	var refreshToken = randtoken.uid(256) 
+	refreshToken = randtoken.uid(256) 
   refreshTokens[refreshToken] = name; 
     res.json({message: "Password accepted", token: token, refreshToken: refreshToken});
   } else {
@@ -169,8 +171,34 @@ app.post("/login", function(req, res) {
   }
 });
 
+app.post('/token', function (req, res, next) {
+  var name = req.body.name
+  user = users[_.findIndex(users, {name: name})];
+  console.log(req.body.refreshToken);
+  refreshToken = req.body.refreshToken;
+  if((refreshToken in refreshTokens) && (refreshTokens[refreshToken] == name)) {
+    /*var user = {
+      'name': name
+    }*/
+	var payload = {id: user.id, exp:(Date.now() / 1000) + 60};
+    var token = jwt.sign(payload, jwtOptions.secretOrKey);
+	//var token = jwt.sign(user, secret, { expiresIn: (Date.now() / 1000) + 60 })
+    res.json({token: 'JWT ' + token})
+  }
+  else {
+    res.status(401).json({message:"Cannot get refresh token"});
+	console.log(refreshToken);
+  console.log(name);
+  }
+  
+})
+
 app.get("/test", passport.authenticate('jwt', { session: false }), function(req, res){
   res.json({message: "Successful"});
+});
+
+app.get("/", function(req, res) {
+  res.json("Main Page");
 });
 
 function getToken() {
