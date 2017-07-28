@@ -1,10 +1,11 @@
 {
-	"prodConfig":
+	"Config":
 	{
-			"userPoolID": us-east-2_6Ty3PX9Ss,
-			"clientID": 6m4hcbg93084uktp7bep6m8128,
-			"region": us-east-2,
+			"userPoolID": "us-east-2_6Ty3PX9Ss",
+			"clientID": "6m4hcbg93084uktp7bep6m8128",
+			"region": "us-east-2",
 			"accessKeyId": "AKIAI2FRIJ2MDJGVS43Q",
-			"secretAccessKey": "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"
+			"secretAccessKey": "SWjHHj/Z5G2YFfrTM5+X/yW9Jzi4tq4xXMglQ6yY",
+			"dbName": "UserDetailsProd"
 	}
 }
