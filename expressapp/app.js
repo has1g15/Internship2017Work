@@ -1,3 +1,4 @@
+var config = require('config');
 var _ = require("lodash");
 var express = require("express");
 var app = express();
@@ -13,63 +14,10 @@ var refreshTokens = {}
 var secret = "secret" 
 
 var passportJWT = require("passport-jwt");
-//var Auth0Strategy = require('passport-auth0');
 
 var ExtractJwt = passportJWT.ExtractJwt;
 var JwtStrategy = passportJWT.Strategy;
 
-/*var strategy = new Auth0Strategy(
-  {
-    domain: 'timhannah.eu.auth0.com',
-    clientID: 'kbbO4O2GK9MVgRfVY7Usz_5yKZUBj5Hf',
-    clientSecret: 'T2vzr4pzpdYbUfnCuJhCwOY',
-    callbackURL: 'http://localhost:3000/callback'
-  },
-  (accessToken, refreshToken, extraParams, profile, done) => {
-    return done(null, profile);
-  }
-);*/
-
-/*var env = {
-  AUTH0_CLIENT_ID: 'kbbO4O2GK9MVgRfVY7Usz_5yKZUBj5Hf',
-  AUTH0_DOMAIN: 'timhannah.eu.auth0.com',
-  AUTH0_CALLBACK_URL: 'http://localhost:3000/callback'
-};*/
-
-/*Perform the login
-router.get(
-  '/login',
-  passport.authenticate('auth0', {
-    clientID: env.AUTH0_CLIENT_ID,
-    domain: env.AUTH0_DOMAIN,
-    redirectUri: env.AUTH0_CALLBACK_URL,
-    audience: 'https://' + env.AUTH0_DOMAIN + '/userinfo',
-    responseType: 'code',
-    scope: 'openid'
-  }),
-  function(req, res) {
-    res.redirect('/');
-  }
-);
-
-// Perform session logout and redirect to homepage
-router.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
-});
-
-// Perform the final stage of authentication and redirect to '/user'
-router.get(
-  '/callback',
-  passport.authenticate('auth0', {
-    failureRedirect: '/'
-  }),
-  function(req, res) {
-    res.redirect(req.session.returnTo || '/user');
-  }
-);*/
-
-// This can be used to keep a smaller payload
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
@@ -106,8 +54,6 @@ var users = [
   }
 ];
 
-
-
 var jwtOptions = {}
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
 jwtOptions.secretOrKey = 'secretKey';
@@ -124,38 +70,23 @@ var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
   }
 });
 
-/*var oauthStrategy = new refresh({
-    authorizationURL: 'https://authserver/oauth2/auth',
-    tokenURL: 'https://authserver/oauth2/token',
-    clientID: 'clientID',
-    clientSecret: 'clientSecret',
-    callbackURL: '/login',
-    passReqToCallback: false //Must be omitted or set to false in order to work with OAuth2RefreshTokenStrategy
-  });*/
-
 passport.use(strategy);
-//refresh.use(new oauthStrategy);
 
 app.use(passport.initialize());
-
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-
 app.use(bodyParser.json());
 
 var refreshToken;
-
 var user;
 
 app.post("/login", function(req, res) {
-	//res.json("Login");
   if(req.body.name && req.body.password){
     var name = req.body.name;
 	user = users[_.findIndex(users, {name: name})];
     var password = req.body.password;
   }
-  // usually this would be a database call:
   if( ! user ){
     res.status(401).json({message:"Unable to find user"});
   }
@@ -214,7 +145,6 @@ function getToken() {
   xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
   xhr.addEventListener('load', function() {
     var responseObject = JSON.parse(this.response);
-    //console.log(responseObject);
     if (responseObject.token) {
       tokenElement.innerHTML = responseObject.token;
     } else {
@@ -223,9 +153,7 @@ function getToken() {
   });
 
   var sendObject = JSON.stringify({name: user, password: password});
-
   console.log('going to send', sendObject);
-
   xhr.send(sendObject);
 }
 
