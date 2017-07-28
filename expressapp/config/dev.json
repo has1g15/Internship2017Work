@@ -1,0 +1,10 @@
+{
+	"devConfig":
+	{
+			"userPoolID": "us-east-2_M8LZIsbAN",
+			"clientID": "5q5hugosg9t383rpi5mcfn0j74",
+			"region": "us-east-2",
+			"accessKeyId": "AKIAI2FRIJ2MDJGVS43Q",
+			"secretAccessKey": "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"
+	}
+}
