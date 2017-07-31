@@ -1,6 +1,48 @@
-This simple express application allows users to be created and added to an Amazon Cognito user pool, users passwords to be changed as well as reset in the case they have forgotten them. 
+This simple express application allows users to be created and added to an Amazon Cognito user pool, users' passwords to be changed as well as reset in the case they have forgotten them.
+We are using Amazon Web Services (AWS) for this, so make a free account if you don't already have one.
 
-1. Creating users 
+First, go to DynamoDB on AWS and set up a database of users. Click "DynamoDB" or simply type it into the search bar.
+
+![ddb screenshot](https://user-images.githubusercontent.com/9966869/28771845-33c5acec-75dc-11e7-8aab-2567c49b9283.png)
+
+Then, click "Create Table" to create the database.
+
+![ddb createtable](https://user-images.githubusercontent.com/9966869/28771941-84e283ca-75dc-11e7-9fce-4abd016d12ab.png)
+
+Next, go to Cognito from the Amazon Web Services homepage by clicking on the icon or simply typing "Cognito" into the search bar.
+
+![cognito screenshot](https://user-images.githubusercontent.com/9966869/28772512-5cdbb66a-75de-11e7-94c8-77adb260aba9.png)
+
+Click on "Manage your User Pools", then click "Create User Pool".
+
+![cognito manage pools](https://user-images.githubusercontent.com/9966869/28772654-aeb3407a-75de-11e7-9832-41cf996ab8da.png)
+
+Give a name to your user pool and when prompted click "Step through settings"
+
+![cognito step settings](https://user-images.githubusercontent.com/9966869/28772796-2b3da2c0-75df-11e7-8691-c0be800b74d5.png)
+
+Choose the standard attributes, email is recommended, and choose the password strength, amazon recommends a minimum length of 8. Then select if users can sign themselves up and specify how long until an unconfirmed account expires.
+On the next page, leave all the settings as default and click "Create Role".
+
+Personalise your verification messages as you wish.
+
+![cognito personalise message](https://user-images.githubusercontent.com/9966869/28774920-721eee30-75e7-11e7-8ff1-ab8ff3e2302d.png)
+
+Add a tag to your user pool.
+
+![cognito tag](https://user-images.githubusercontent.com/9966869/28775172-82b225d6-75e8-11e7-8249-5e5921763bbc.png)
+
+Now you can create your application.
+
+![cognito create app](https://user-images.githubusercontent.com/9966869/28775306-1fe7437c-75e9-11e7-96ec-e0282ddc1469.png)
+
+Click "Create Pool". Then go to the  "Users and Groups" section and click "Create User".
+
+![cognito create user](https://user-images.githubusercontent.com/9966869/28775413-bbc97580-75e9-11e7-8832-49acc6400328.png)
+
+
+
+1. Creating users
 
 Initially users can be added via a rest client by providing an API gateway URL, and JSON data for payload, for example:
 
