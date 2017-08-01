@@ -75,6 +75,15 @@ On the left hand side, select "Stages" and then select "dev", select your API an
 
 ![api url](https://user-images.githubusercontent.com/9966869/28821468-725f925c-76ad-11e7-917e-329786ed4da4.png)
 
+Open up your rest client and paste the link into the top section.
+Then select POST and enter JSON similar to what is shown in the image below, using the name of your table and the names and attributes you desire, remembering to include the primary key.
+
+![api add user](https://user-images.githubusercontent.com/9966869/28822843-c655ae46-76b2-11e7-9e07-d22475da4fcb.png)
+
+If you go to DynamoDB, under the Items tab you can see the newly added user.
+
+![api data evidence](https://user-images.githubusercontent.com/9966869/28823049-a9241e92-76b3-11e7-9344-eeef03b87cee.png)
+
 (3) Creating a Cognito user pool
 
 Next, go to Cognito from the Amazon Web Services homepage by clicking on the icon or simply typing "Cognito" into the search bar.
@@ -106,7 +115,10 @@ Now you can create your application.
 ![cognito create app](https://user-images.githubusercontent.com/9966869/28775306-1fe7437c-75e9-11e7-96ec-e0282ddc1469.png)
 
 Click "Create Pool" and you are done!
+Our code will automatically add users from the DynamoDB table into the Cognito user pool with a default password of Password1.
+You can change this and other things from the command line, this link provides all the aws cognito commands: http://docs.aws.amazon.com/cli/latest/reference/cognito-idp/index.html
 
+Here are the operations you can perform with our code:
 
 1. Creating users
 
