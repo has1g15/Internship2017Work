@@ -93,11 +93,14 @@ app.use(bodyParser.json());
 
 var refreshToken;
 var user;
+var name;
 
 //Login gives access token provided username and password are valid - token can be tested using /test route 
 app.post("/login", function(req, res) {
+	//generating refresh token
+	refreshToken = randtoken.uid(256);
   if(req.body.name && req.body.password){
-    var name = req.body.name;
+    name = req.body.name;
 	user = users[_.findIndex(users, {name: name})];
     var password = req.body.password;
   }
@@ -109,11 +112,9 @@ app.post("/login", function(req, res) {
 	  //setting token expiration time 
     var payload = {id: user.id, exp:(Date.now() / 1000) + 60};
     var token = jwt.sign(payload, jwtOptions.secretOrKey);
-	//generating refresh token 
-	refreshToken = randtoken.uid(256) 
-  refreshTokens[refreshToken] = name; 
+	
     //when both user and password are recognised, access token is released 
-    res.json({message: "Password accepted", token: token, refreshToken: refreshToken});
+    res.json({message: "Password accepted", token: token});
   } else {
     res.status(401).json({message:"Passwords do not match"});
   }
@@ -121,7 +122,7 @@ app.post("/login", function(req, res) {
 
 //when provided with a refresh token, a new access token is released 
 app.post('/token', function (req, res, next) {
-  var name = req.body.name
+  name = req.body.name
   user = users[_.findIndex(users, {name: name})];
   refreshToken = req.body.refreshToken;
   if((refreshToken in refreshTokens) && (refreshTokens[refreshToken] == name)) {
@@ -142,8 +143,9 @@ app.post('/token', function (req, res, next) {
 })
 
 //authenticates token 
-app.get("/test", passport.authenticate('jwt', { session: false }), function(req, res){
-  res.json({message: "Successful"});
+app.get("/test", passport.authenticate('jwt', { session: false }), function(req, res){ 
+  refreshTokens[refreshToken] = name; 
+  res.json({refreshToken: refreshToken});
 });
 
 app.get("/", function(req, res) {
@@ -153,9 +155,16 @@ app.get("/", function(req, res) {
 //route adds all users to user pool who have been added via REST client 
 app.get("/createusers", function(req, res) {
   res.json({message: "Add users via Postman or similar REST client, they will then be allocated a password"});
-  function checkNewUsers(){
+  //function is called every 3 seconds to check for any newly added users 
+  setTimeout(checkNewUsers, 3000);
+  console.log("checking");
+});
+
+function checkNewUsers(){
+	console.log("I got here");
   child = exec("aws dynamodb scan --table-name " + dbName, function (error, stdout, stderr) {
-		child = exec("aws cognito-idp list-users --user-pool-id " + userPoolID, function (error2, stdout2, stderr2) {
+		child = exec("aws cognito-idp list-users --user-pool-id " + userPoolID, function (error2, stdout2, stderr2) {0
+			console.log(stdout2);
 			userPool = stdout2;
 			if(error !== null) {
 				console.log("Error" + stderr2);
@@ -168,7 +177,7 @@ app.get("/createusers", function(req, res) {
 				if (userPool.indexOf(parts[i]) < 0)
 				{
 					console.log(parts[i] + " has been checked");
-					child=exec("aws cognito-idp sign-up --client-id " + clientID + " --password Password1 --user-attributes Name=email,Value=" + parts[i+6] + " Name=phone_number,Value=+447543216789 --username " + parts[i] + " " + region, function (error, stdout, stderr){
+					child=exec("aws cognito-idp sign-up --client-id " + clientID + " --password Password1 --user-attributes Name=email,Value=" + parts[i+6] + " Name=phone_number,Value=+447543216789 --username " + parts[i] + " --region " + region, function (error, stdout, stderr){
 						if (error == null)
 						{
 							console.log("User Successfully Created");
@@ -186,11 +195,8 @@ app.get("/createusers", function(req, res) {
 			}
 		});
 	});
-	//function is called every 3 seconds to check for any newly added users 
-	setTimeout(checkNewUsers, 3000);
   }
-});
-
+  
 //simulates user changing password 
 app.get("/forgotpassword", function(req, res) {
 	res.json({message: "Forgot Password"});
