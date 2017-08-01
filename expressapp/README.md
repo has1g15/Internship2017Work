@@ -1,5 +1,8 @@
 This simple express application allows users to be created and added to an Amazon Cognito user pool, users' passwords to be changed as well as reset in the case they have forgotten them.
-We are using Amazon Web Services (AWS) for this, so make a free account if you don't already have one.
+We are using Amazon Web Services (AWS) for this, so make a free account if you don't already have one. You will also need to install the aws command line to perform certain operations.
+For setting this all up, we will provide instructions to (1) Create a DynamoDB table, (2) Create an API and (3) Create a Cognito user pool.
+
+(1) Creating a DynamoDB table
 
 First, go to DynamoDB on AWS and set up a database of users. Click "DynamoDB" or simply type it into the search bar.
 
@@ -8,6 +11,17 @@ First, go to DynamoDB on AWS and set up a database of users. Click "DynamoDB" or
 Then, click "Create Table" to create the database.
 
 ![ddb createtable](https://user-images.githubusercontent.com/9966869/28771941-84e283ca-75dc-11e7-9fce-4abd016d12ab.png)
+
+Give the table an appropriate name and specify a Primary Key, a unique identifier for each item. Then press create table.
+
+![ddb creating table](https://user-images.githubusercontent.com/9966869/28782956-b6900512-7606-11e7-9428-0dfb3c9165f5.png)
+
+If you click on the Items tab you can view the information about the table.
+
+![ddb view info](https://user-images.githubusercontent.com/9966869/28784863-8bd7ff2c-760c-11e7-9cbd-63ae7137e190.png)
+
+
+(3) Creating a Cognito user pool
 
 Next, go to Cognito from the Amazon Web Services homepage by clicking on the icon or simply typing "Cognito" into the search bar.
 
@@ -36,10 +50,7 @@ Now you can create your application.
 
 ![cognito create app](https://user-images.githubusercontent.com/9966869/28775306-1fe7437c-75e9-11e7-96ec-e0282ddc1469.png)
 
-Click "Create Pool". Then go to the  "Users and Groups" section and click "Create User".
-
-![cognito create user](https://user-images.githubusercontent.com/9966869/28775413-bbc97580-75e9-11e7-8832-49acc6400328.png)
-
+Click "Create Pool" and you are done!
 
 
 1. Creating users
