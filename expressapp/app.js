@@ -94,13 +94,18 @@ app.use(bodyParser.json());
 var refreshToken;
 var user;
 var name;
+var refreshTokens = [];
 
 //Login gives access token provided username and password are valid - token can be tested using /test route 
 app.post("/login", function(req, res) {
 	//generating refresh token
-	refreshToken = randtoken.uid(256);
   if(req.body.name && req.body.password){
     name = req.body.name;
+	refreshToken = randtoken.uid(256);
+	refreshTokens[refreshToken] = name;
+	console.log(refreshToken);
+	console.log(refreshTokens[refreshToken]);
+	console.log(name);
 	user = users[_.findIndex(users, {name: name})];
     var password = req.body.password;
   }
@@ -135,16 +140,17 @@ app.post('/token', function (req, res, next) {
     res.json({token: 'JWT ' + token})
   }
   else {
-    res.status(401).json({message:"Cannot get refresh token"});
-	console.log(refreshToken);
-  console.log(name);
+    res.status(401).json({message:"Invalid refresh token"});
+	console.log(refreshToken in refreshTokens);
+	console.log(refreshTokens[refreshToken] == name);
+	console.log(name);
   }
   
 })
 
 //authenticates token 
 app.get("/test", passport.authenticate('jwt', { session: false }), function(req, res){ 
-  refreshTokens[refreshToken] = name; 
+  
   res.json({refreshToken: refreshToken});
 });
 
