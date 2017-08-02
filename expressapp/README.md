@@ -122,7 +122,8 @@ Here are the operations you can perform with our code:
 
 1. Creating users
 
-Initially users can be added via a rest client by providing an API gateway URL, and JSON data for payload, for example:
+Initially users can be added via a rest client by providing an API gateway URL, and JSON data for payload, as detailed above.
+Here is an example of a user being created:
 
 {
   "operation": "create",
@@ -137,23 +138,27 @@ Initially users can be added via a rest client by providing an API gateway URL, 
   }
 }
 
-This will add the user to a DynamoDB table "UserDetailsDev" on Amazon Web Services 
+This will add the user to a DynamoDB table "UserDetailsDev" on Amazon Web Services.
 
-The application is designed to add users to the Cognito user pool if they exist in the DynamoDB table but aren't yet in the user pool, enabling them to have a password 
+The application is designed to add users to the Cognito user pool if they exist in the DynamoDB table but aren't yet in the user pool, enabling them to have a password - set as default to Password1.
 
-2. Changing a user's password 
+2. Changing a user's password
 
 On the change password page of the express server, you can simulate a user's change of password - a random user will be chosen and their password changed by the application which executes the change-password Cognito command.
 
-For future development, the application could have a front end in which the user enters their choice of new password as well as their previous password. 
+For future development, the application could have a front end in which the user enters their choice of new password as well as their previous password.
 
-3. Resetting a user's password 
+3. Resetting a user's password
 
 This action is carried out in a similar way to changing password, the application randomly changes a user's password.
 
-For future development, the application would have a front end in which a user could input their username and the application would execute the forgot-password Cognito command. The user would receive an email with an authentication code to put into the front end and then reset their password from there.
+For future development, the application would have a front end in which a user could input their username and the application would execute the forgot-password Cognito command.
+The user would receive an email with an authentication code to put into the front end and then reset their password from there.
 
 4. Authentication via a token
 
-At the moment, if you go onto a rest client (we are using Postman), go to the URL https://localhost:3000/login and type in the header a valid username and password then Send a GET request, you will receive an access token and refresh token. If you then go to the URL https://localhost:3000/test and type in "Authorisation" for the key in the header, then "JWT " followed by the access token, you will receive a message that says "Success". You will not receive this message if an invalid access token is used.
-Similarly, if you go to https://localhost:3000/token and type in "name" as a key in the body followed by an accepted username, as well as "refreshToken" with the refresh token then you will receive a new access token. You will not receive the access token if an invalid refresh token or name is used.
+At the moment, if you go onto the rest client, go to the URL https://localhost:3000/login and type in the header a valid username and password then Send a GET request, you will receive an access token.
+If you then go to the URL https://localhost:3000/getRefresh and type in "Authorisation" for the key in the header, then "JWT " followed by the access token, you will receive a refresh token.
+You will not receive it if an invalid access token is used.
+Similarly, if you go to https://localhost:3000/getNewAccess and again type in "name" as a key in the body followed by the same username you used in /login, as well as "refreshToken" with the refresh token you received in /getRefresh, then you will receive a new access token.
+You will not receive a new access token if an invalid refresh token or name is used.
