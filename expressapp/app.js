@@ -126,7 +126,7 @@ app.post("/login", function(req, res) {
 });
 
 //when provided with a refresh token, a new access token is released 
-app.post('/token', function (req, res, next) {
+app.post('/getNewAccess', function (req, res, next) {
   name = req.body.name
   user = users[_.findIndex(users, {name: name})];
   refreshToken = req.body.refreshToken;
@@ -137,20 +137,19 @@ app.post('/token', function (req, res, next) {
 	var payload = {id: user.id, exp:(Date.now() / 1000) + 60};
     var token = jwt.sign(payload, jwtOptions.secretOrKey);
 	//var token = jwt.sign(user, secret, { expiresIn: (Date.now() / 1000) + 60 })
-    res.json({token: 'JWT ' + token})
+    res.json({token: 'JWT ' + token});
   }
   else {
     res.status(401).json({message:"Invalid refresh token"});
-	console.log(refreshToken in refreshTokens);
-	console.log(refreshTokens[refreshToken] == name);
+	console.log(refreshToken);
+	console.log(refreshTokens[refreshToken]);
 	console.log(name);
   }
   
 })
 
 //authenticates token 
-app.get("/test", passport.authenticate('jwt', { session: false }), function(req, res){ 
-  
+app.get("/getRefresh", passport.authenticate('jwt', { session: false }), function(req, res){ 
   res.json({refreshToken: refreshToken});
 });
 
