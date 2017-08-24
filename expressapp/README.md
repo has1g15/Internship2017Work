@@ -200,4 +200,26 @@ Deploying application to AWS Elastic Beanstalk:
 
   - Create a new application from the Elastic Beanstalk dashboard 
   
-  ![create app](https://files.slack.com/files-pri/T5VR79918-F6FRYET9P/image.png?pub_secret=5a98c30406)
+  ![create app](https://files.slack.com/files-pri/T5VR79918-F6SM31909/image.png?pub_secret=3864b7a530)
+  
+  - Create a Dockerrun.aws.json file in application root directory, as example:
+  
+  ```
+  {
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "has1g15/expressapp",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "3000"
+    }
+  ],
+  "Logging": "/var/log/nginx"
+  }
+  ```
+  - Upload this file before creating application
+  
+  ![upload code](https://files.slack.com/files-pri/T5VR79918-F6SHQ7NEL/image.png?pub_secret=b8fa450b38) 
+  
