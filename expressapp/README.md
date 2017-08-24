@@ -163,20 +163,20 @@ You will not receive it if an invalid access token is used.
 Similarly, if you go to https://localhost:3000/getNewAccess and again type in "name" as a key in the body followed by the same username you used in /login, as well as "refreshToken" with the refresh token you received in /getRefresh, then you will receive a new access token.
 You will not receive a new access token if an invalid refresh token or name is used.
 
-=======================================================================================================================
+=====================================================================================
 
 Deploying application to AWS Elastic Beanstalk:
 
 - Dockerize web application before deployment 
   - Create a Dockerfile, using following as example:
   
-  `FROM node:boron
-  WORKDIR /Users/Hannah/Internship2017Work/expressapp
-  COPY package.json .
-  RUN npm install
-  COPY . .
-  EXPOSE 8081
-  ENV NODE_ENV dev
-  CMD [ "npm", "start" ]`
+  `FROM node:boron`
+  `WORKDIR /Users/Hannah/Internship2017Work/expressapp`
+  `COPY package.json .`
+  `RUN npm install`
+  `COPY . .`
+  `EXPOSE 8081`
+  `ENV NODE_ENV dev`
+  `CMD [ "npm", "start" ]`
   
   - Then build Docker image 
