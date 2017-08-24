@@ -202,7 +202,7 @@ Deploying application to AWS Elastic Beanstalk:
   
   ![create app](https://files.slack.com/files-pri/T5VR79918-F6SM31909/image.png?pub_secret=3864b7a530)
   
-  - Create a Dockerrun.aws.json file in application root directory, as example:
+   - Create a Dockerrun.aws.json file in application root directory, as example:
   
   ```
   {
@@ -219,7 +219,16 @@ Deploying application to AWS Elastic Beanstalk:
   "Logging": "/var/log/nginx"
   }
   ```
-  - Upload this file before creating application
+   - Upload this file before creating application
   
   ![upload code](https://files.slack.com/files-pri/T5VR79918-F6SHQ7NEL/image.png?pub_secret=b8fa450b38) 
   
+   - Now the app environment will be created 
+   
+  ![create environment](https://files.slack.com/files-pri/T5VR79918-F6SHXPDUY/image.png?pub_secret=b6dd751d40)
+  
+   - Ensure that health is labelled as ok and the URL can be used to view the app
+   
+  ![ok health](https://files.slack.com/files-pri/T5VR79918-F6UAE7SNB/image.png?pub_secret=d52292cd8c)
+  ![click url](https://files.slack.com/files-pri/T5VR79918-F6T5KESP5/image.png?pub_secret=f3450194a1)
+  
