@@ -200,4 +200,4 @@ Deploying application to AWS Elastic Beanstalk:
 
   - Create a new application from the Elastic Beanstalk dashboard 
   
-  ![create app] (https://synoteinternship.slack.com/files/chirrut-imwe/F6FRYET9P/image.png)
+  ![create app](https://slack-files.com/T5VR79918-F6FRYET9P-5a98c30406)
