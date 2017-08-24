@@ -1,5 +1,5 @@
 This simple express application allows users to be created and added to an Amazon Cognito user pool, users' passwords to be changed as well as reset in the case they have forgotten them.
-Before you being you will need:
+Before you begin you will need:
 - An Amazon Web Services (AWS) account, you can make a free account if you don't already have one.
 - The aws command line to perform certain operations.
 - A rest client, we are using Postman.
@@ -170,6 +170,7 @@ Deploying application to AWS Elastic Beanstalk:
 - Dockerize web application before deployment 
   - Create a Dockerfile, using following as example:
   
+  
   ```
   FROM node:boron
   WORKDIR /Users/Hannah/Internship2017Work/expressapp
@@ -188,3 +189,15 @@ Deploying application to AWS Elastic Beanstalk:
   - When image is successfully built, run image: 
   
   `docker run -p 49163:8081 has1g15/expressapp`
+  
+  - Use `docker ps` command to obtain container ID, this can then be used with `docker logs <container ID>`
+  
+  - App can be called with curl command, e.g. `curl -i 192.168.99.100:49163`
+  
+  - Now the image can be deployed
+  
+- Deploy Docker container on Elastic Beanstalk
+
+  - Create a new application from the Elastic Beanstalk dashboard 
+  
+  ![create app] (https://synoteinternship.slack.com/files/chirrut-imwe/F6FRYET9P/image.png)
