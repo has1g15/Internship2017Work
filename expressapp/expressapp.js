@@ -49,12 +49,50 @@ var child;
 
 var usernames = [];
 var count = 0;		
+var n = 0;
 
 function random (low, high) {
     return Math.random() * (high - low) + low;
 }
 
-//Temporary test users 
+var userList;
+var userArray = [];
+
+//Makes list of confirmed users from cognito pool for use of token authentication to check valid users 
+function createConfirmedUserList() {
+	child = exec("aws dynamodb scan --table-name " + dbName, function (error, stdout, stderr) {
+		child = exec("aws cognito-idp list-users --user-pool-id " + userPoolID, function (error2, stdout2, stderr2) {
+			userPool = stdout2;
+			if(error !== null) {
+				console.log("Error" + stderr2);
+			}
+			parts = stdout.split('\"');
+	  //goes through the usernames in DynamoDB and checks if they're in Cognito or not, if not it adds them		
+			for (var i = 21; i < parts.length; i+=24)
+			{
+				console.log(parts[i]);
+				if (userPool.indexOf(parts[i]) > 0)
+				{
+					//If user is confirmed, added to user list with arbitrary id, username and default password 
+					userArray[n] = {
+						id: n+1,
+						name: parts[i],
+						password: 'Password'
+					}
+					n++;
+				}	
+			}
+			console.log(userArray);
+			
+			if (error !== null) {
+				console.log('exec error: ' + error);
+			}
+		});
+	});
+}
+
+/*
+Temporary test users 
 var users = [
   {
 	id: 1,
@@ -66,7 +104,7 @@ var users = [
     name: 'trs1g15',
     password: 'Password2'
   }
-];
+];*/
 
 var jwtOptions = {}
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeader();
@@ -78,7 +116,7 @@ var strategy = new JwtStrategy(jwtOptions, function(jwt_payload, next) {
 	
 	console.log('payload received', jwt_payload);
   //TODO: iterate round dynamoDB users to check existing user rather than test users 
-  var user = users[_.findIndex(users, {id: jwt_payload.id})];
+  var user = userArray[_.findIndex(userArray, {id: jwt_payload.id})];
   if (user) {
     next(null, user);
   } else {
@@ -93,6 +131,11 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
+
+app.get("/", function(req, res) {
+	createConfirmedUserList();
+  res.json("Main Page");
+});
 
 var refreshToken;
 var user;
@@ -109,7 +152,7 @@ app.post("/login", function(req, res) {
 	console.log(refreshToken);
 	console.log(refreshTokens[refreshToken]);
 	console.log(name);
-	user = users[_.findIndex(users, {name: name})];
+	user = userArray[_.findIndex(userArray, {name: name})];
     var password = req.body.password;
   }
   if( ! user ){
@@ -128,19 +171,20 @@ app.post("/login", function(req, res) {
   }
 });
 
+//authenticates token 
+app.get("/getRefresh", passport.authenticate('jwt', { session: false }), function(req, res){ 
+  res.json({refreshToken: refreshToken});
+});
+
 //when provided with a refresh token, a new access token is released 
 app.post('/getNewAccess', function (req, res, next) {
-  name = req.body.name
-  user = users[_.findIndex(users, {name: name})];
+  name = req.body.name;
   refreshToken = req.body.refreshToken;
+  user = userArray[_.findIndex(userArray, {name: name})];
   if((refreshToken in refreshTokens) && (refreshTokens[refreshToken] == name)) {
-    /*var user = {
-      'name': name
-    }*/
 	var payload = {id: user.id, exp:(Date.now() / 1000) + 60};
     var token = jwt.sign(payload, jwtOptions.secretOrKey);
-	//var token = jwt.sign(user, secret, { expiresIn: (Date.now() / 1000) + 60 })
-    res.json({token: 'JWT ' + token});
+    res.json({token: token});
   }
   else {
     res.status(401).json({message:"Invalid refresh token"});
@@ -148,17 +192,7 @@ app.post('/getNewAccess', function (req, res, next) {
 	console.log(refreshTokens[refreshToken]);
 	console.log(name);
   }
-  
 })
-
-//authenticates token 
-app.get("/getRefresh", passport.authenticate('jwt', { session: false }), function(req, res){ 
-  res.json({refreshToken: refreshToken});
-});
-
-app.get("/", function(req, res) {
-  res.json("Main Page");
-});
 
 //route adds all users to user pool who have been added via REST client 
 app.get("/createusers", function(req, res) {
@@ -169,9 +203,8 @@ app.get("/createusers", function(req, res) {
 });
 
 function checkNewUsers(){
-	console.log("I got here");
   child = exec("aws dynamodb scan --table-name " + dbName, function (error, stdout, stderr) {
-		child = exec("aws cognito-idp list-users --user-pool-id " + userPoolID, function (error2, stdout2, stderr2) {0
+		child = exec("aws cognito-idp list-users --user-pool-id " + userPoolID, function (error2, stdout2, stderr2) {
 			console.log(stdout2);
 			userPool = stdout2;
 			if(error !== null) {
@@ -188,8 +221,7 @@ function checkNewUsers(){
 					child=exec("aws cognito-idp sign-up --client-id " + clientID + " --password Password1 --user-attributes Name=email,Value=" + parts[i+6] + " Name=phone_number,Value=+447543216789 --username " + parts[i] + " --region " + region, function (error, stdout, stderr){
 						if (error == null)
 						{
-							console.log("User Successfully Created");
-							action = "Created user " + parts[i];
+							action = "Successfully created user " + parts[i];
 						}
 						else {
 							console.log("Error: " + stderr);
