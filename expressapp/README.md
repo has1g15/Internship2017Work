@@ -155,12 +155,25 @@ This action is carried out in a similar way to changing password, the applicatio
 For future development, the application would have a front end in which a user could input their username and the application would execute the forgot-password Cognito command.
 The user would receive an email with an authentication code to put into the front end and then reset their password from there.
 
-4. Authentication via a token
+=================================================================================
+Token Authentication
 
-At the moment, if you go onto the rest client, go to the URL https://localhost:3000/login and type in the header a valid username and password then Send a GET request, you will receive an access token.
-If you then go to the URL https://localhost:3000/getRefresh and type in "Authorisation" for the key in the header, then "JWT " followed by the access token, you will receive a refresh token.
+If you use a rest client such as Postman used in the following example, opt to send a GET request and go to the login route:
+
+![login example](https://files.slack.com/files-pri/T5VR79918-F6TNR0PA8/image.png?pub_secret=f67546105a)
+
+In the header, there is a username and password set from the stored user list, on sending the request, an access token will be received in the body. 
+
+Then go to the URL https://localhost:8081/getRefresh and type in "Authorisation" for the key in the header, then "JWT " followed by the access token, this will enable you to receive a refresh token.
+
+![get refresh example](https://files.slack.com/files-pri/T5VR79918-F6TNS6F9A/image.png?pub_secret=b9ec6ba8a4)
+
 You will not receive it if an invalid access token is used.
-Similarly, if you go to https://localhost:3000/getNewAccess and again type in "name" as a key in the body followed by the same username you used in /login, as well as "refreshToken" with the refresh token you received in /getRefresh, then you will receive a new access token.
+
+Following this, if you access https://localhost:8081/getNewAccess and again type in "name" as a key in the body followed by the same username you used in /login, as well as "refreshToken" with the refresh token you received in /getRefresh, then you will receive a new access token.
+
+![get new access example](https://files.slack.com/files-pri/T5VR79918-F6T5F7HDX/image.png?pub_secret=db1f097e25)
+
 You will not receive a new access token if an invalid refresh token or name is used.
 
 =================================================================================
