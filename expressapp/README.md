@@ -1,5 +1,5 @@
 This simple express application allows users to be created and added to an Amazon Cognito user pool, users' passwords to be changed as well as reset in the case they have forgotten them.
-Before you being you will need:
+Before you begin you will need:
 - An Amazon Web Services (AWS) account, you can make a free account if you don't already have one.
 - The aws command line to perform certain operations.
 - A rest client, we are using Postman.
@@ -162,3 +162,73 @@ If you then go to the URL https://localhost:3000/getRefresh and type in "Authori
 You will not receive it if an invalid access token is used.
 Similarly, if you go to https://localhost:3000/getNewAccess and again type in "name" as a key in the body followed by the same username you used in /login, as well as "refreshToken" with the refresh token you received in /getRefresh, then you will receive a new access token.
 You will not receive a new access token if an invalid refresh token or name is used.
+
+=================================================================================
+
+Deploying application to AWS Elastic Beanstalk:
+
+- Dockerize web application before deployment 
+  - Create a Dockerfile, using following as example:
+  
+  
+  ```
+  FROM node:boron
+  WORKDIR /Users/Hannah/Internship2017Work/expressapp
+  COPY package.json .
+  RUN npm install
+  COPY . .
+  EXPOSE 8081
+  ENV NODE_ENV dev
+  CMD [ "npm", "start" ]
+  ```
+  
+  - Then build Docker image in Docker terminal:
+  
+  `docker build -t has1g15/expressapp .`
+  
+  - When image is successfully built, run image: 
+  
+  `docker run -p 49163:8081 has1g15/expressapp`
+  
+  - Use `docker ps` command to obtain container ID, this can then be used with `docker logs <container ID>`
+  
+  - App can be called with curl command, e.g. `curl -i 192.168.99.100:49163`
+  
+  - Now the image can be deployed
+  
+- Deploy Docker container on Elastic Beanstalk
+
+  - Create a new application from the Elastic Beanstalk dashboard 
+  
+  ![create app](https://files.slack.com/files-pri/T5VR79918-F6SM31909/image.png?pub_secret=3864b7a530)
+  
+   - Create a Dockerrun.aws.json file in application root directory, as example:
+  
+  ```
+  {
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "has1g15/expressapp",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "3000"
+    }
+  ],
+  "Logging": "/var/log/nginx"
+  }
+  ```
+   - Upload this file before creating application
+  
+  ![upload code](https://files.slack.com/files-pri/T5VR79918-F6SHQ7NEL/image.png?pub_secret=b8fa450b38) 
+  
+   - Now the app environment will be created 
+   
+  ![create environment](https://files.slack.com/files-pri/T5VR79918-F6SHXPDUY/image.png?pub_secret=b6dd751d40)
+  
+   - Ensure that health is labelled as ok and the URL can be used to view the app
+   
+  ![ok health](https://files.slack.com/files-pri/T5VR79918-F6UAE7SNB/image.png?pub_secret=d52292cd8c)
+  ![click url](https://files.slack.com/files-pri/T5VR79918-F6T5KESP5/image.png?pub_secret=f3450194a1)
+  
