@@ -12,10 +12,10 @@ let should = chai.should();
 chai.use(chaiHttp);
 
   /*
-  * Test the /POST route
+  * Test the create /POST route
   */
   describe('/POST user', () => {
-      it('it should POST a user ', (done) => {
+      it('should POST a user ', (done) => {
         let user = {
             Username: "postUser",
             Course: "BScCompSci",
@@ -23,7 +23,7 @@ chai.use(chaiHttp);
             Mobile: "07567123890"
         }
         chai.request(server)
-            .post('https://we8imx60ad.execute-api.us-east-2.amazonaws.com/dev/userdao')
+            .post('https://we8imx60ad.execute-api.us-east-2.amazonaws.com/dev/userdao')  //use API Gateway URL
             .send(user)
             .end((err, res) => {
                 res.should.have.status(200);
@@ -42,7 +42,7 @@ it('Main page content', function() {
     });
 });
 
-it('Main page status', function() {
+it('Create users content', function() {
     request('http://localhost:8081/createusers' , function(error, response, body) {
         
     });
